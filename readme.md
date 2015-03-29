@@ -1,10 +1,9 @@
-## Blog50
+## BBS
 
-This is a simple Laravel app for a blog website to demonstrate key features of this web framework
+This is a simple Laravel app for a BBS website to demonstrate key features of this web framework
 
-Companion slides: https://www.dropbox.com/s/nmi8sryhnl8voqo/eouyang_cs50_laravel-seminar_slides.pdf?dl=0
 
-It is recommended that you run this example on the CS50 Appliance
+It is recommended that you run this example on the BBS Appliance
 
 ### Setup
 
@@ -16,15 +15,15 @@ It is recommended that you run this example on the CS50 Appliance
 
 2. Download the repository.
 
-Distribution code: `git clone https://github.com/ericouyang/blog50.git`
+Distribution code: `https://github.com/farrah8888/yaoi_forum.git`
 
-Completed example: `git clone -b completed https://github.com/ericouyang/blog50.git`
+Completed example: `git clone -b completed https://github.com/farrah8888/yaoi_forum.git`
 
-3. Navigate into the new `blog50` folder and install dependencies
+3. Navigate into the new `BBS` folder and install dependencies
 
 `composer install`
 
-4. If you're running the completed example, you need to create the database called `blog50` and then run
+4. If you're running the completed example, you need to create the database called `BBS` and then run
 
 `php artisan migrate`
 
