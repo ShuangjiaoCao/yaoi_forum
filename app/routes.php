@@ -13,7 +13,10 @@
 
 Route::get('/', array('uses' => 'HomeController@index', 'as' => 'home'));
 
-
+Route::get('home', array('before' => 'auth', function()
+{
+    return View::make('home')->with('user', Post::user())->with('posts', Post::with('tags')->where('user_id', '=', Auth::id())->orderBy('created_at', 'desc')->get());
+}));
 
 
 
@@ -34,6 +37,7 @@ Route::group(array('before' => 'auth'), function()
 	Route::get('logout', array('uses' => 'UserController@getLogout', 'as' => 'getLogout'));
 });	
 
+Route::model('user', 'User');
 
 Route::get('user/{id}/edit', array('before' => 'auth', 'as' => 'user.edit', function($id)
 {
@@ -79,10 +83,70 @@ Route::put('user/{id}', array('before' => 'auth|csrf', function($id)
 
 
 //Route::get('/', 'BlogController@index');
+Route::get('user/{user}/posts', 'UserController@getPosts'); 
+Route::get('user/{user}/lieblings', 'UserController@getFaveritePosts');  
+//Route::get('user/{id}/myfaverate', 'UserController@addFaveritePost');
 
+Route::get('post/{id}/allupdates', 'PostController@onlyU');
 
 Route::resource('post', 'PostController');  
 
+
+Route::post('/post/{id}/faverates', array(
+  'as' => 'addFaveritePost',
+  'uses' => 'UserController@addFaveritePost'
+));
+
+
+
+
+Route::post('/post/{id}/comment', array(
+  'as' => 'createComment',
+  'uses' => 'CommentController@createComment'
+));
+
+Route::post('/post/{id}/update', array(
+  'as' => 'createUpdate',
+  'uses' => 'CommentController@createUpdate'
+));
+
+Route::resource('comment', 'CommentController');  
+
+
+Route::get('get_auto_Cps', 'SearchController@getAutoCps');
+
+Route::get('get_auto_Circle', 'SearchController@getAutoCircle');
+
+Route::get('get_auto_Charakters', 'SearchController@getAutoCharakters');
+
+Route::get('get_auto_Tags', 'SearchController@getAutoTags');
+
+Route::get('search', 'SearchController@index');
+
+
+
+
+Route::post('search_normal', 'SearchController@postNormalSearch');
+Route::post('search_komplex', 'SearchController@postKomplexSearch');
+
+
+Route::get('tag/{id}/posts', 'TagController@posts');
+Route::resource('tag', 'TagController');
+
+Route::get('circle/{id}/posts', 'CircleController@posts');
+Route::resource('circle', 'CircleController');
+
+Route::get('cp/{id}/posts', 'CpController@posts');
+Route::resource('cp', 'CpController');
+
+Route::get('charakter/{id}/posts', 'CharakterController@posts');
+Route::resource('charakter', 'CharakterController');
+
+
+//Route::get('search_normal', 'SearchController@getNormalSearch');
+
+
+//Route::post('post/{id}/preview', array('before' => 'auth', 'uses' => 'PostController@preview'));
 
 /*Route::get('/post/new', array(   //add a new article (the new post view)
   'as' => 'newPost',
@@ -96,7 +160,7 @@ Route::resource('post', 'PostController');
 Route::post('/post/new', array(   //add a new article and clikck "post"
   'as' => 'createPost',
   'uses' => 'PostController@store'
-));*/
+));
 
 Route::get('/post/{id}', array(
   'as' => 'viewPost',
@@ -106,4 +170,4 @@ Route::get('/post/{id}', array(
 Route::post('/post/{id}/comment', array(
   'as' => 'createComment',
   'uses' => 'BlogController@createComment'
-));
+));*/

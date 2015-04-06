@@ -4,9 +4,12 @@
 
 @section('content')
 
-
+  <div class="am-g am-g-fixed">
+   <div class="am-u-sm-12">
 
   <h3 class="page-header">写文</h3>
+
+
 <!-- form  action="{{ URL::to('post/store') }}" method="post">-->
  @if ($errors->has())
     <div class="am-alert am-alert-danger" data-am-alert>
@@ -17,28 +20,21 @@
 {{ Form::open(array('url' => 'post', 'class' => 'form')) }}
    
 	<!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
- <div class="row form-inline" style="margin: 10px;padding: 10px;" >
+ <div class="row form-inline"  >
 
-	<div class="col-xs-2">
-   		<div class="form-group">
-	 		<input name="circle" class="form-control" type="text" placeholder="圈子/作品" />
-  		</div>
-  	</div>
-
-
-  	<div class="col-xs-6 col-sm-3">  
+   
 		 <div class="input-group">
 
   		 	 <div class="form-group">
      		 <select name="isEnd" class="form-control">
-    			<option value="0" selected="selected">完结</option>
+    			<option value="0">完结</option>
     			<option value="1">连载</option>
 			</select>
    		    </div>
     		
     		<div class="form-group">
  				<input name="title" class="form-control" type="text" value="{{ Input::old('title') }}" placeholder="标题" />
-  			</div>
+  
     	
 
     	</div><!-- /input-group -->
@@ -47,16 +43,23 @@
   
 
 
-  	<div class="col-xs-2">
+  	
       <div class="form-group">
-  		<input name="name" class="form-control" type="text" placeholder="作者马甲" /> 	
+  		<input name="name" class="form-control" type="text" value="{{ Input::old('name')}}" placeholder="作者马甲" /> 	
   	   </div>
 
-  	</div>
+  
 
 	
 
-	<div class="col-xs-2">
+      <div class="form-group">
+      <input id="circlename_input" name="circle" class="form-control" type="text" value="{{ Input::old('circle')}}"  placeholder="圈子/作品" />
+      </div>
+    
+
+
+
+
 		<div class="form-group has-error ">
   			<div class="checkbox">
     		<label>
@@ -65,8 +68,6 @@
     </label>
   </div>
  </div>
-  	</div>
-
 
 </div>  	
 
@@ -75,28 +76,20 @@
 	 
 
 	<div class="col-xs-6 col-sm-3" >
-   		<div class="form-group">
-	 		 <label for="tags">人物/角色</label>
-          <input id="tags" name="tags" type="text" value="{{ Input::old('tags') }}"/>
-            <p class="am-form-help">多个角色之间请输入","</p>
-  		</div>
+    <input id="charakters" name="charakters"  placeholder="请添加人物/角色" type="text" value="{{ Input::old('charakters') }}"/>
+            <p class="am-form-help">主要人物/角色</p>
+  	
   	</div>
 
-<div class="col-xs-6 col-sm-3" >
-   		<div class="form-group">
-	 		 <label for="tags">CP</label>
-          <input id="tags" name="tags" type="text" value="{{ Input::old('tags') }}"/>
-            <p class="am-form-help">多个CP之间请输入","</p>
-  		</div>
-  	</div>
+    <div class="col-xs-6 col-sm-3" >
+   		 <input  id="cps" name="cps" type="text" value="{{ Input::old('cps') }}"  placeholder="请添加CP" >
+          <p class="am-form-help">CP</p>
+  	
+  	     </div>
 
-  	<div class="col-xs-6 col-sm-3" >
-   		<div class="form-group">
-	 		 <label for="tags">标签</label>
-          <input id="tags" name="tags" type="text" value="{{ Input::old('tags') }}"/>
-            <p class="am-form-help">多个标签之间请输入","</p>
-  		</div>
-  	</div>
+  	 <input id="tags" name="tags" type="text"  placeholder="请添加其他Tag" value="{{ Input::old('tags') }}"/>
+            <p class="am-form-help">其他Tag</p>
+  	
 
 </div>
 
@@ -131,7 +124,8 @@
        
  </div> 
    
-  
+     </div> 
+      </div> 
 
 
   <!-- /form>-->

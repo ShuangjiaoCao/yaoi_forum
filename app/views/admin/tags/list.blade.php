@@ -1,0 +1,1 @@
+/Applications/MAMP/htdocs/blog50-completed/app/views/admin/tags/list.blade.php

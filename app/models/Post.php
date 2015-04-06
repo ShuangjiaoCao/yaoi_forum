@@ -7,7 +7,7 @@ class Post extends Eloquent {
 
 
 
- protected $fillable = ['title', 'content'];
+ protected $fillable = ['title', 'content', 'circle'];
 
 
    // one-to-many relationship with the Comment model
@@ -16,9 +16,36 @@ class Post extends Eloquent {
     return $this->hasMany('Comment');
   }
 
+    public function updates()
+  {
+    return $this->hasMany('Update');
+  }
+
  public function tags()
     {
         return $this->belongsToMany('Tag');
+    }
+
+ public function users()
+    {
+        return $this->belongsToMany('User');
+    }
+
+
+
+     public function circle()
+    {
+        return $this->belongsTo('Circle');
+    }
+
+    public function charakters()
+    {
+        return $this->belongsToMany('Charakter');
+    }
+
+    public function cps()
+    {
+        return $this->belongsToMany('Cp');
     }
 
 

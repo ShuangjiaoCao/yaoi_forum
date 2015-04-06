@@ -9,6 +9,93 @@ body {
   }
 }
 
+#article_bd{
+  border:1px solid #bbb;
+
+
+}
+
+
+
+#editpost, #onlypost, #faverate, button[id^="delete"] {
+float:right;
+
+margin-right: 5px;
+
+}
+
+
+
+
+.commentCount{
+  float:right;
+  
+
+}
+
+#update_article{
+  border:1px solid #bbb;
+ 
+
+}
+
+#comment_article{
+  border:1px solid #bbb;
+
+
+}
+
+
+#circlename{
+   font-size : 15px;
+
+   background-color: #779ADB 
+
+
+}
+#circlename:hover{
+
+ color: #333;
+
+}
+
+
+#cpname{
+   font-size : 15px;
+   
+}
+
+#cpname:hover{
+    color: #333;
+   
+}
+
+
+#circlename_show{
+   font-size : 20px;
+    color: #fff;
+   background-color: #779ADB 
+}
+
+#circlename_show:hover{
+
+ color: #333;
+
+}
+
+
+#cpname_show{
+   font-size : 20px;
+    color: #fff;
+
+}
+
+#cpname_show:hover{
+
+ color: #333;
+
+}
+
 .row{
   margin-top: 50px;
   margin-bottom: 50px

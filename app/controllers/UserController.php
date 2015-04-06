@@ -2,6 +2,64 @@
 
 class UserController extends BaseController
 {
+
+
+public function getPosts(User $user)
+{
+    return View::make('home')
+    ->with('user', $user)
+    ->with('posts', Post::with('tags,circle,charakters,cps'))
+    	->where('user_id', '=', $user->id)
+    	->orderBy('created_at', 'desc')
+    	->paginate(15);
+}
+
+
+public function getFaveritePosts(User $user)
+{
+
+	$posts = $user->faverate_posts() ->orderBy('created_at', 'desc')
+	 ->paginate(15);
+
+	 return View::make('searchlists.normal')
+	 ->with('posts', $posts);
+	
+	
+    //return View::make('home')->with('user', $user)->with('posts', Post::with('tags')->where('user_id', '=', $user->id)->orderBy('created_at', 'desc')->get());
+}
+
+
+
+public function addFaveritePost($id)
+{
+	$post = Post::with('circle','tags', 'cps', 'charakters')->find($id);
+	$user = Auth::user();
+	$user_post=	$user->faverate_posts()->where('post_id','=', $id)->first(); //the post with uders like
+ 	//$result = []; 
+
+
+if($user_post!=null)
+{    // if already liked
+//var_dump("already liked!");
+ $user->faverate_posts()->detach($post);
+ $result = Array("response" => false);
+ // $result['response'] = false;    // cancel the faverate
+}else {
+//var_dump("liked u!");
+$user->faverate_posts()->save($post);
+$result = Array("response" => true);       // like the post
+ 
+}
+$user->save();
+    //$myfaverate = 
+ //return Redirect::route('post.show', $post->id);
+  return Response::json($result);
+  //return $result;
+    //return View::make('home')->with('user', $user)->with('posts', Post::with('tags')->where('user_id', '=', $user->id)->orderBy('created_at', 'desc')->get());
+}
+
+
+
 	//gets the view for the register page
 	public function getCreate()
 	{
