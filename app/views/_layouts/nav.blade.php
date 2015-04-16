@@ -1,11 +1,28 @@
 
+
+
+
 <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-secondary am-show-sm-only"
         data-am-collapse="{target: '#collapse-head'}"><span class="am-sr-only">nav switch</span>
         <span class="am-icon-bars"></span></button>
 
+
+
+
 <div class="am-collapse am-topbar-collapse" id="collapse-head">
   
+@if (Auth::check() &&Auth::user()->is_admin)
+<ul class="am-nav am-nav-pills am-topbar-nav">
+  <li><a href="{{ URL::to('admin/tags') }}">标签</a></li>
+</ul>
+
+
+@endif
+
     <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right">
+
+
+
 
     @if (Auth::check())
       <li class="am-dropdown" data-am-dropdown>
@@ -24,13 +41,21 @@
         </ul>
       </li>
   
+
+
+
   @else
-  <div class="am-topbar-right">
-    <a href="{{ URL::to('create') }}" class="am-btn am-btn-secondary am-topbar-btn am-btn-sm topbar-link-btn"><span class="am-icon-pencil"></span>注册</a>
-  </div>
+
   <div class="am-topbar-right">
     <a href="{{ URL::to('login') }}" class="am-btn am-btn-secondary am-topbar-btn am-btn-sm topbar-link-btn"><span class="am-icon-user"></span>登录</a>
   </div>
+
+  <div class="am-topbar-right">
+    <a href="{{ URL::to('create') }}" class="am-btn am-btn-secondary am-topbar-btn am-btn-sm topbar-link-btn"><span class="am-icon-pencil"></span>注册</a>
+  </div>
+
+
+  
 @endif
 
   <div class="am-topbar-right">
@@ -41,13 +66,4 @@
 
   </ul>
  </div>
-
-
-
-
-
-
-
-
-
 

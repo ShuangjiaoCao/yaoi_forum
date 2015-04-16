@@ -72,7 +72,7 @@ function checkbox_checked($checkboxName)
     //$update->is18 = Input::get('name');
 
 
-  if (Input::has('isEnd')){//0:end 
+  if (Input::has('isEnd')){   //0:end 
     $post->isEnd =  0;
     $post->save();
 
@@ -80,9 +80,7 @@ function checkbox_checked($checkboxName)
 
     $update->is18 =  (Input::has('is18'))? 1 : 0;  // 1:meat
 
-
-
-    $update->content = nl2br(Input::get('content'));
+ $update->content = nl2br(Input::get('content'));
 
     // save the comment with a relation to the post
     $post->updates()->save($update);
@@ -113,9 +111,12 @@ public function canOperation($route, $request)
 public function onlyU($id)
 {
     $post = Post::with('circle','tags', 'cps', 'charakters')->find($id);
-    $updates = Comment::where('name','=', $post->name)
-                    ->orderBy('created_at')->paginate(20);
-     $user = Auth::user();
+    $updates = Comment::where('post_id', '=', $post->id)
+                      ->where('isUpdate','=', '1')  
+                        ->orderBy('created_at')->paginate(20);  
+
+if (Auth::check()){                    
+ $user = Auth::user();
   $user_post= $user->faverate_posts()->where('post_id','=', $id)->first(); //the post with uders like
 
 if($user_post!=null)
@@ -132,10 +133,58 @@ if($user_post!=null)
       'comments' => $updates,
       'alreadyLike'   => $alreadyLike    
     ));
+  } else {
+ $this->layout->content = View::make('articles.onlyU', array(
+      'post' => $post,
+      'comments' => $updates,
+      'alreadyLike'   => false    
+       ));
+
+
+  }
+
 
 }
 
 
+
+
+
+public function top($id){
+
+  $post = Post::find($id);
+
+
+ $post->top = ( $post->top  == 1)  ?   0:   1;
+ $post->update();
+
+$result = Array("response" =>  $post->top);
+
+
+
+// $result = Array("response" => 1);
+ return Response::json($result);
+//return View::make('articles.show')->with('post', $post);
+}
+
+
+
+public function block($id){
+
+  $post = Post::find($id);
+
+
+ $post->block = ( $post->block  == 1)  ?   0:   1;
+
+$post->update();
+$result = Array("response" =>  $post->block);
+
+
+
+// $result = Array("response" => 1);
+ return Response::json($result);
+//return View::make('articles.show')->with('post', $post);
+}
 
 
 public function edit($id)
@@ -167,15 +216,27 @@ public function edit($id)
 }
 
 
+
 public function update($id)
 {
+
+
+function nl2p($text) {
+
+    return "<p>" . str_replace("\n", "</p><p>", $text) . "</p>";
+
+  }
+
+
     $rules = [
-        'title'   => 'required|max:100',
+        'title'   => 'required|max:20',
         'content' => 'required',
-        'name' => 'required',
-        'summary' => 'required',
-        'circle' => 'required',
-        'charakters' => 'required',
+        'name' => 'required|max:10',
+        'summary' => 'required|max:70',
+        'circle' => 'required|max:20',
+        'charakters' => 'max:40',
+        'cps' => 'max:20',
+        'tags' => 'max:20',
         //'tags'    => array('required', 'regex:/^\w+$|^(\w+,)+\w+$/'),
     ];
     $validator = Validator::make(Input::all(), $rules);
@@ -194,23 +255,18 @@ public function update($id)
          $post->is18 =  0;
           }
 
-
-
-
-
-
     $post->isEnd =  Input::get('isEnd');
     $post->summary =  Input::get('summary');
     $post->name =  Input::get('name');
+     $post->content =   Input::get('content');
   
 
+   // $resolved_content = nl2br(Markdown::parse(  Input::get('content')));
+    $resolved_content = nl2p(Input::get('content'));
 
 
-
-
-
-        $resolved_content = Markdown::parse(Input::get('content'));
-        $post->resolved_content = $resolved_content;
+       
+    $post->resolved_content = $resolved_content;
 
 
 //$cps2= Input::get('cps');
@@ -220,7 +276,7 @@ $tags_re= preg_replace("/(\n)|(\s)|(\t)|(\')|(')|(，)|(\.)/",',',Input::get('ta
 $cps_re= preg_replace("/(\n)|(\s)|(\t)|(\')|(')|(，)|(\.)/",',',Input::get('cps'));
 $charakters_re=preg_replace("/(\n)|(\s)|(\t)|(\')|(')|(，)|(\.)/",',',Input::get('charakters'));
 
-  // 黑花，你是谁。  全部的string
+  
 $tags = array_unique(explode("," , $tags_re ));
 $cps = array_unique(explode("," , $cps_re ));
 $charakters = array_unique(explode("," , $charakters_re ));
@@ -231,32 +287,36 @@ $charakters = array_unique(explode("," , $charakters_re ));
           //$circle_old = Circle::whereName($circlename); 
 
 
-          $circle = Circle::whereName($circlename)->first();   // 新输入的圈子名，比如银魂
-          $circle_old = $post->circle;  // 之前输入的圈子，比如猎人
-          //$circle->count--;
+          $circle = Circle::whereName($circlename)->first();   // 新输入的圈子名
+          $circle_old = $post->circle;  // 之前输入的圈子
           
-        if (strcmp($circle, $circle_old) !== 0) {  //如果输入的和以前不一样
-          $circle_old->count--;
-         
-          $circle_old->posts()->detach($post->id);
+          
+        if (strcmp($circle, $circle_old) !== 0) {  //如果输入的和以前不一样先把以前那个删了
+           $circle_old->count--;        
            $circle_old->save();
 
-          
-          //echo '输入的和以前不一样';
+           if($circle_old->count ==0 )
+                $circle_old->delete();
 
 
-              if (!$circle) {  // 如果数据库里面没有银魂
+
+
+              if (!$circle) {  // 如果数据库里面没有这个新输入的圈子
            
             $circle = Circle::create(array('name' => $circlename));  //crate p new circle with new npme
             $circle->count++;
 
-             //echo '输入的是新圈子';
             
-            }   else {   // 如果数据库里面有银魂
+
+            
+            
+            }   else {   // 如果数据库里面有这个圈子
               $circle->count++;
    
-            //echo '输入的是数据库里面已经有的圈子';
+            
             }
+
+            
 
 
 
@@ -273,7 +333,10 @@ $charakters = array_unique(explode("," , $charakters_re ));
             } else {
                 $tag->count--;
                 $tag->save();
-                $post->tags()->detach($tag->id);
+                 $post->tags()->detach($tag->id);
+
+                   if($tag->count ==0 )
+                        $tag->delete();
                 // $tag->posts()->detach($post->id);
                 //$tag->save();
             }
@@ -293,13 +356,19 @@ $charakters = array_unique(explode("," , $charakters_re ));
 
 
       foreach ($post->cps as $cp) {
+         $cp->circle_id= $circle->id;
+         $cp->update();
             if (($index = array_search($cp->name, $cps)) !== false) {
                 unset($cps[$index]);
-            } else {
+
+          } else {
                 $cp->count--;
                 $post->cps()->detach($cp->id);
+               
                 //$cp->posts()->detach($post->id);
-                //$cp->save();
+                $cp->save();
+                if($cp->count ==0 )
+                        $cp->delete();
             }
         }
         foreach ($cps as $cpName) {
@@ -309,22 +378,38 @@ $charakters = array_unique(explode("," , $charakters_re ));
             }
             
             $cp->count++;
+
             $cp->circle_id = $circle->id;
             $post->cps()->save($cp);
              //$cp->posts()->save($post);
-             //$cp->save();
+             $cp->save();
         }
 
 
 
           foreach ($post->charakters as $charakter) {
+             $charakter->circle_id= $circle->id;
+             $charakter->update();
             if (($index = array_search($charakter->name, $charakters)) !== false) {
+
                 unset($charakters[$index]);
+
             } else {
                 $charakter->count--;
                 $post->charakters()->detach($charakter->id);
+               
+
+
                 //$charakter->posts()->detach($post->id);
-                //$charakter->save();
+                $charakter->save();
+                if($charakter->count ==0 )
+                        $charakter->delete();
+                //var_dump(  $charakter->name);
+          
+
+
+
+
 
             }
         }
@@ -332,12 +417,13 @@ $charakters = array_unique(explode("," , $charakters_re ));
             $charakter = Charakter::whereName($charakterName)->first();   //数据库已经有这个角色
             if (!$charakter) {
                 $charakter = Charakter::create(array('name' => $charakterName)); //新出现的角色
+               // var_dump(  $charakter->name);
             }
             $charakter->count++;
             $charakter->circle_id = $circle->id;
             $post->charakters()->save($charakter);
            // $charakter->posts()->save($post);
-            //$charakter->save();
+            $charakter->save();
         }
 
         
@@ -357,21 +443,27 @@ $charakters = array_unique(explode("," , $charakters_re ));
 
  public function store()
 {
+function nl2p($text) {
 
+    return "<p>" . str_replace("\n", "</p><p>", $text) . "</p>";
+
+  }
 
     $rules = [
-        'title'   => 'required|max:100',
+        'title'   => 'required|max:20',
         'content' => 'required',
-        'name' => 'required',
-        'summary' => 'required',
-        'circle' => 'required',
-        'charakters' => 'required',
+        'name' => 'required|max:10',
+        'summary' => 'required|max:70',
+        'circle' => 'required|max:20',
+        'charakters' => 'max:40',
+        'cps' => 'max:20',
+        'tags' => 'max:20',
 
         //''    => array('required', 'regex:/^\w+$|^(\w+,)+\w+$/'),
     ];
-    $validator = Validator::make(Input::all(), $rules);
+      $validator = Validator::make(Input::all(), $rules);
     if ($validator->passes()) {
-        $post = POST::create(Input::only( 'name','title', 'content','is18','summary','isEnd'));
+        $post = Post::create(Input::only('name','title', 'content','is18','summary','isEnd'));
 
 //$myValue = checkbox_value('is18', '0');
 
@@ -390,23 +482,25 @@ $charakters = array_unique(explode("," , $charakters_re ));
        // $post->is18 =  Input::get('is18');
     $post->isEnd =  Input::get('isEnd');
    $post->summary =  Input::get('summary');
-   $post->name =  Input::get('name');
+  
+   $post->content =  Input::get('content');
 
 
-
-   
-   //$circle = Circle::create(array('name' => Input::get('circle')));
-   //$post->circle_id = $circle->id;
-
-   //$post->circlename =   Input::get('circle');
-
-   //$post->circle->name =  Input::get('circle');
-
-  // $post->circle_id =  Input::get('circle_id');
    $post->user_id = Auth::id();
-   $resolved_content = Markdown::parse(Input::get('content'));
+
+   //$resolved_content = nl2br( Markdown::parse(Input::get('content')));
+   $resolved_content = nl2p(Input::get('content'));
    $post->resolved_content = $resolved_content;
 
+
+if( Auth::user()->is_admin){
+ $post->is_admin = 1;
+  
+
+}
+ 
+
+  $post->name =  Input::get('name');
 
 $tags_re= preg_replace("/(\n)|(\s)|(\t)|(\')|(')|(，)|(\.)/",',',Input::get('tags'));
 $cps_re= preg_replace("/(\n)|(\s)|(\t)|(\')|(')|(，)|(\.)/",',',Input::get('cps'));
@@ -505,36 +599,48 @@ public function destroy($id)
 
 
 $post = Post::find($id);
-
-        $circle = $post->circle;
-
+      $circle = $post->circle;
         $circle->count--;
         $circle->save();
-        //$post->circle->detach($tag->id);
+        if($circle->count == 0) 
+           $circle->delete();
 
 
     foreach ($post->tags as $tag) {
         $tag->count--;
         $tag->save();
         $post->tags()->detach($tag->id);
+        if($tag->count == 0) 
+           $tag->delete();
+
+
     }
 
    foreach ($post->cps as $cp) {
         $cp->count--;
         $cp->save();
         $post->cps()->detach($cp->id);
+        if($cp->count == 0) 
+           $cp->delete();
     }
 
        foreach ($post->charakters as $charakter) {
         $charakter->count--;
         $charakter->save();
         $post->charakters()->detach($charakter->id);
+         if($charakter->count == 0) 
+           $charakter->delete();
     }
 
-    foreach ($post->comments as $comment) {
-        
+    foreach ($post->comments as $comment) { 
+         foreach ($comment->children as $child) { 
+
+     //destroy($comment->id);    
+        $child->delete();
+
+ }
         $comment->delete();
-        //$post->comments()->detach($comment->id);
+       
     }
 
 
@@ -555,7 +661,7 @@ public function show($id)     // see the detailed post
     $post = Post::findOrFail($id);
     $comments =  $post ->comments() 
                        ->orderBy('created_at')
-                       ->paginate(20);
+                       ->paginate(50);
 if(!Auth::check()){
    $this->layout->content = View::make('articles.show', array(
       'post' => $post,

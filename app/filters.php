@@ -33,6 +33,9 @@ App::after(function($request, $response)
 |
 */
 
+
+
+
 Route::filter('auth', function()
 {
 	if (Auth::guest())
@@ -70,6 +73,15 @@ Route::filter('guest', function()
 	if (Auth::check()) return Redirect::to('/');
 });
 
+
+Route::filter('idAdmin', function()
+{
+    if (!Auth::user()->is_admin) {
+        return Redirect::to('/');
+    }
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | CSRF Protection Filter
@@ -81,10 +93,23 @@ Route::filter('guest', function()
 |
 */
 
+
+
+
+Route::filter('mycsrf', function()
+{
+    if (Session::token() !== Input::get('_token'))
+    {
+        throw new Illuminate\Session\TokenMismatchException;
+    }
+});
+
 Route::filter('csrf', function()
 {
-	if (Session::token() != Input::get('_token'))
-	{
-		throw new Illuminate\Session\TokenMismatchException;
-	}
+    
 });
+
+
+
+
+

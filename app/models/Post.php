@@ -2,7 +2,6 @@
 
 class Post extends Eloquent {
  use SoftDeletingTrait;
- use Conner\Tagging\TaggableTrait;
 
 
 
@@ -64,8 +63,19 @@ public function user()
   // helper function to get a string of the number of comments
   public function getNumCommentsStr()
   {
-    $num = $this->comments()->count();
 
-    return $num . ' 评论';
+    $num_child =0;
+    foreach ($this->comments as $comment) {
+     $num_child += $comment->getNumChildrenStr();
+     
+      //echo( $num_child );
+      //$num = $this->comments()->count() + $comment->children()->count();
+    }
+    $num = $this->comments()->count() + $num_child;
+    //$num = strval (intval($this->comments()->count()) +  intval($num_child)); 
+  //var_dump( $num );
+    //var_dump( $num );
+
+    return $num;
   }
 }

@@ -7,6 +7,12 @@
         
         <!--/span-->
         <div class="col-md-8">
+ @if ($errors->has())
+    <div class="am-alert am-alert-danger" data-am-alert>
+      <p>{{ $errors->first() }}</p>
+    </div>
+    @endif
+    
             <div class="panel-body panel-list-group">
     <div class="list-group">
     @foreach ($posts as $post)

@@ -12,12 +12,15 @@ class CreateCommentsTable extends Migration {
       $table->increments('id');
       $table->string('name');
       $table->text('content');
-       $table->integer('index');
-	  $table->boolean('isUpdate')->default(0);
+      $table->integer('index');
+	    $table->boolean('isUpdate')->default(0);
       $table->boolean('is18')->default(null);
-
       $table->integer('post_id');
       $table->timestamps();
+
+
+
+      
     });
   }
 

@@ -4,15 +4,35 @@ class UserController extends BaseController
 {
 
 
-public function getPosts(User $user)
+
+    public function getPosts(User $user)
 {
-    return View::make('home')
-    ->with('user', $user)
-    ->with('posts', Post::with('tags,circle,charakters,cps'))
+
+$posts = Post::with('tags','circle','charakters','cps')
     	->where('user_id', '=', $user->id)
     	->orderBy('created_at', 'desc')
     	->paginate(15);
+//$user =   User::find($user_id);
+
+
+//if( !is_null($posts)){
+ return View::make('home')
+    ->with('user', $user)
+    ->with('posts',$posts);
+    	
+
+//	} else {
+//	var_dump("ddd");	
+ //	return View::make('home')
+ 	// ->with('user', $user)
+   	//->with('posts',null);
+	//}
+
+
+   
 }
+
+
 
 
 public function getFaveritePosts(User $user)
@@ -71,6 +91,10 @@ $user->save();
 	{
 		return View::make('users.login');
 	}
+
+
+
+
 
 	public function postCreate()
 	{

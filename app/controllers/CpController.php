@@ -5,7 +5,7 @@ class CpController extends BaseController {
 	public function __construct()
 	{
 		$this->beforeFilter('auth', array('only' => array('create', 'store', 'edit', 'update', 'destroy')));
-		$this->beforeFilter('csrf', array('only' => array('store', 'update', 'destroy')));
+		$this->beforeFilter('mycsrf', array('only' => array('store', 'update', 'destroy')));
 	}
 
 	public function posts($id)
@@ -69,7 +69,7 @@ class CpController extends BaseController {
 	 */
 	public function edit($id)
 	{
-		return View::make('tags.edit')->with('cp', Cp::find($id));
+		return View::make('tags.cp.edit')->with('cp', Cp::find($id));
 	}
 
 	/**
@@ -82,12 +82,44 @@ class CpController extends BaseController {
 	public function update($id)
 	{
 		$rules = array(
-			'name' => array('required', 'regex:/^\w+$/'),
+			'name' => array('required'),
 		);
 		$validator = Validator::make(Input::only('name'), $rules);
 		if ($validator->passes()) {
-			Cp::find($id)->update(Input::only('name'));
-			return Redirect::back()->with('message', array('type' => 'success', 'content' => '修改成功'));
+
+			//$oldTag = Tag::find($id);    //如果这个新改的tag和以前数据库的tag重名
+
+
+			$existTag= Cp::where('name', '=', Input::get('name')) -> first();
+			 if( $existTag != null ) {        //如果重名
+				$tag = Cp::find($id); 
+			
+ 				$existTag->count += $tag->count; 
+ 				foreach ($tag->posts as $post) {   //把这个tag合并到新的上去
+				$existTag->posts()->save($post);
+					}
+
+				$existTag->save();	
+
+
+		        //$tag->count = 0;
+				
+
+				foreach ($tag->posts as $post) {
+				$tag->posts()->detach($post->id);  //删除这个tag
+				}
+				$tag->delete();
+				return Redirect::to('/');
+
+
+			 }  else {
+
+				Cp::find($id)->update(Input::only('name'));
+				return Redirect::back()->with('message', array('type' => 'success', 'content' => '修改成功'));
+
+			 }
+
+			
 		} else {
 			return Redirect::back()->withInput()->withErrors($validator);
 		}
@@ -103,11 +135,12 @@ class CpController extends BaseController {
 	public function destroy($id)
 	{
 		$cp = Cp::find($id);
-		$cp->count = 0;
-		$cp->save();
+		//$cp->count = 0;
+		//$cp->save();
 		foreach ($cp->posts as $posts) {
 			$cp->posts()->detach($posts->id);
 		}
+		$cp->delete();
 		return Redirect::back();
 	}
 }

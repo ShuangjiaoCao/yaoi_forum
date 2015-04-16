@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Database\Eloquent\SoftDeletingTrait;
-
 class Cp extends Eloquent {
 
-    use SoftDeletingTrait;
+
 
     protected $fillable = ['name'];
 

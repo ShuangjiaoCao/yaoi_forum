@@ -193,13 +193,18 @@ return Response::json($result);
 			
 
 	}
- 		
+ 		if(  count($posts) == 0 ){  
+$error  ="要求太高，找不到！";
 
+
+
+ return Redirect::back()->withErrors($error); 
+} else {  
 
      //$posts = Post::with('user', 'name')->orderBy('created_at', 'desc')->paginate(5);
 	 // $this->layout->content = View::make('searchlists.normal', compact('posts'));
  //$this->layout->content =  View::make('searchlists.normal')->with('posts',  $posts);
-  $this->layout->search_content =  View::make('searchlists.normal')->with('posts',  $posts);
+  $this->layout->search_content =  View::make('searchlists.normal')->with('posts',  $posts); }
 
 }
 
@@ -222,29 +227,55 @@ public function articles($id)
 
 	if (Input::has('circles_search')){       //如果填了圈子
 		//$circle_q = Input::get('circle_search');
+
+
+
 		$circle = Circle::where('name','=',  Input::get('circles_search'))   
 					->first();    			//得到圈子
+
+
+		if( $circle !=null  ){
+
+
 
 		$filter_charakters= $filter_charakters->where('circle_id','=', $circle->id); //得到该圈子的所有角色
 
 		$filter_cps= $filter_cps->where('circle_id','=', $circle->id); //得到该圈子的所有CP
 
-		$filter_posts= $filter_posts->where('circle_id','=', $circle->id); //得到该圈子的所有文章
+		$filter_posts =$filter_posts->where('circle_id','=', $circle->id); //得到该圈子的所有文章
+
 			
-		
+		}   else {
+			$filter_charakters=null;
+			$filter_cps= null;
+			$filter_posts= null;
+		}
+
+
 
 	} else {
 		$circle = null;
 
 	}
 	
-	if (Input::has('charakters_search')){   //如果填了角色, 得到所有有这个角色的文章
+	if (Input::has('charakters_search') ){   //如果填了角色, 得到所有有这个角色的文章
+
 		$charakter = Charakter::where('name','=',  Input::get('charakters_search'))   
 					->first();    			//得到角色
-		$filter_posts = $charakter->posts();     //该角色的所有文章
+		if ($charakter != null) {
+		//$filter_posts = $charakter->posts();     //该角色的所有文章
+
+		$filter_posts = $filter_posts -> whereHas('charakters', function($q)
+		{
+			//$q->where('id', '=', Input::get('charakters_search')); 
+    		$q->where('name', '=', Input::get('charakters_search'));   //
+
+		});
 
 
-		                     
+	}else {
+		$filter_posts = null;
+	}	                     
 
 
 	} else {
@@ -256,7 +287,19 @@ public function articles($id)
 		$circle_q = Input::get('cps_search');
 		$cp= Cp::where('name','=', Input::get('cps_search')) 
 						->first(); 
-		$filter_posts = $cp->posts();     //该CP的所有文章
+
+	if ($cp != null) {
+		//$filter_posts = $cp->posts();     //该CP的所有文章
+		$filter_posts = $filter_posts -> whereHas('cps', function($q)
+		{
+			//$q->where('id', '=', Input::get('charakters_search')); 
+    		$q->where('name', '=', Input::get('cps_search'));   //
+
+		});
+	}  else {
+		$filter_posts = null;
+
+	}
 		             
 	} else {
 		$cp=null;
@@ -268,8 +311,22 @@ if (Input::has('tags_search')){   //如果填了TAG, 得到所有有这个TAG的
 		$circle_q = Input::get('circle_search');
 		$tag= Tag::where('name','=', Input::get('tags_search')) 
 						->first(); 
-		$filter_posts = $tag->posts();     //该TAG的所有文章
-			
+	if ($tag != null) {
+
+
+		//$filter_posts = $tag->posts();     //该TAG的所有文章
+$filter_posts = $filter_posts -> whereHas('tags', function($q)
+		{
+			//$q->where('id', '=', Input::get('charakters_search')); 
+    		$q->where('name', '=', Input::get('tags_search'));   //
+
+		});
+
+
+			} else {
+
+				$filter_posts =null; 
+			}
 	} else {
 		$tag = null;
 	}
@@ -291,11 +348,23 @@ if (Input::has('tags_search')){   //如果填了TAG, 得到所有有这个TAG的
         break;
     case 1:
         $isEnd =  "连载文";
-         $filter_posts->where('isEnd','=', '1'); 
+       // $post1=  $filter_posts->where('isEnd','=', '1') 
+		//				->first(); 
+	   if( $filter_posts != null){
+        $filter_posts= $filter_posts->where('isEnd','=', '1'); 
+    }else         { 
+    	$filter_posts= null;
+    }
         break;
     case 2:
         $isEnd =  "完结文";
-        $filter_posts->where('isEnd','=', '0'); 
+        // $post2=  $filter_posts->where('isEnd','=', '0') 
+		//				->first(); 
+	   if( $filter_posts != null){
+        $filter_posts= $filter_posts->where('isEnd','=', '0'); 
+         }else{ 
+        $filter_posts= null;
+    }
 	    break;
 }
 
@@ -306,6 +375,22 @@ if (Input::has('tags_search')){   //如果填了TAG, 得到所有有这个TAG的
 
 }
 	
+if ($filter_posts==null || $filter_charakters==null || $filter_cps==null) {
+	//var_dump("no result!");
+	$error  ="要求太高，找不到！";
+
+
+
+ return Redirect::back()->withErrors($error);
+
+
+
+//$this->layout->search_content =  View::make('searchlists.complex') 
+} else{
+
+
+
+
 	$posts = $filter_posts ->orderBy('updated_at', 'desc')->paginate(15);
 	$charakters = $filter_charakters ->orderBy('count', 'desc')->paginate(15);
 
@@ -327,8 +412,12 @@ if (Input::has('tags_search')){   //如果填了TAG, 得到所有有这个TAG的
                                 'cps' => $cps
                                 
                                 )
+
+
     );
 	//$post = Post::where('circle_id','=','contacts.user_id');  //这个圈子的所有文章
+
+} 
 
 			
 	

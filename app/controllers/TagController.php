@@ -5,7 +5,7 @@ class TagController extends BaseController {
 	public function __construct()
 	{
 		$this->beforeFilter('auth', array('only' => array('create', 'store', 'edit', 'update', 'destroy')));
-		$this->beforeFilter('csrf', array('only' => array('store', 'update', 'destroy')));
+		$this->beforeFilter('mycsrf', array('only' => array('store', 'update', 'destroy')));
 	}
 
 	public function posts($id)
@@ -82,16 +82,52 @@ class TagController extends BaseController {
 	public function update($id)
 	{
 		$rules = array(
-			'name' => array('required', 'regex:/^\w+$/'),
+			'name' => array('required'),
 		);
 		$validator = Validator::make(Input::only('name'), $rules);
 		if ($validator->passes()) {
-			Tag::find($id)->update(Input::only('name'));
-			return Redirect::back()->with('message', array('type' => 'success', 'content' => '修改成功'));
+
+			//$oldTag = Tag::find($id);    //如果这个新改的tag和以前数据库的tag重名
+
+
+			$existTag= Tag::where('name', '=', Input::get('name')) -> first();
+			 if( $existTag != null ) {        //如果重名
+				$tag = Tag::find($id); 
+			
+ 				$existTag->count += $tag->count; 
+ 				foreach ($tag->posts as $post) {   //把这个tag合并到新的上去
+				$existTag->posts()->save($post);
+					}
+
+				$existTag->save();	
+
+
+		        //$tag->count = 0;
+				
+
+				foreach ($tag->posts as $post) {
+				$tag->posts()->detach($post->id);  //删除这个tag
+				}
+				$tag->delete();
+				return Redirect::to('/');
+
+
+			 }  else {
+
+				Tag::find($id)->update(Input::only('name'));
+				return Redirect::back()->with('message', array('type' => 'success', 'content' => '修改成功'));
+
+			 }
+
+	
+			
+			
 		} else {
 			return Redirect::back()->withInput()->withErrors($validator);
 		}
 	}
+
+
 
 	/**
 	 * Remove the specified resource from storage.
@@ -103,11 +139,12 @@ class TagController extends BaseController {
 	public function destroy($id)
 	{
 		$tag = Tag::find($id);
-		$tag->count = 0;
-		$tag->save();
+		//$tag->count = 0;
+		//$tag->save();
 		foreach ($tag->posts as $posts) {
 			$tag->posts()->detach($posts->id);
 		}
+		$tag->delete();
 		return Redirect::back();
 	}
 }

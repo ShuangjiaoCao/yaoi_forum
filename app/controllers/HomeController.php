@@ -61,6 +61,7 @@ $posts = Post::with('tags','user','comments')
        //->leftJoin('comments', 'posts.id', '=', 'comments.post_id')
         //->orderBy(DB::raw('COUNT(posts.id)'))
        //->distinct()
+  	   ->orderBy('top'  , 'desc') 
        ->orderBy('updated_at'  , 'desc') 
       // ->orderBy('posts.updated_at', 'desc')
          //TODO 有重复！！尼玛奇怪。distinct之后乱排！
@@ -69,7 +70,7 @@ $posts = Post::with('tags','user','comments')
         //->select('posts.id')
         //->get();
 
-        ->paginate(15);
+        ->paginate(30);
 
 
 	 	//->get();

@@ -20,6 +20,180 @@ function activateTab(pageId) {
 
 
 $(document).ready(function(){
+var id =  $('#blockpost').val();
+
+ $('[id^=blockform]').submit(function(event){
+
+        $.ajax({
+            type: 'POST',
+            url: '/post/' + id + '/block',
+            data: $('form#ajax').serialize(),
+            dataType: 'json',
+        })
+
+        .done(function(data) { 
+
+            if(data['response'] ==0 ){
+alert("成功解锁！" + data['response'] );
+location.reload();
+
+            } else {
+alert("成功锁帖！" + data['response'] );
+
+location.reload();
+
+            }
+        });
+        //just to be sure its not submiting form
+        return false;
+    });
+
+
+
+var id =  $('#toppost').val();
+
+ $('[id^=topform]').submit(function(event){
+        //event.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: '/post/' + id + '/top',
+            data: $('form#ajax').serialize(),
+            dataType: 'json',
+        })
+
+        .done(function(data) { 
+
+            if(data['response'] ==0 ){
+alert("取消置顶！" + data['response'] );
+location.reload();
+
+            } else {
+alert("成功置顶！" + data['response'] );
+
+location.reload();
+
+            }
+
+        });
+        //just to be sure its not submiting form
+        return false;
+    });
+
+
+
+//var collapse = $('[id^=nestedComment]');
+
+
+  //$('[id^=childCommentButton]').on('click', function(e) {
+    $('[id^=childCommentButton]').click(function(){
+
+var commentid=$(this).attr("value");
+//var test = $(this).find("div" ).id;
+var collapse =$("#nestedComment" + commentid);
+
+
+   if(collapse.hasClass("in")){
+     collapse.toggle();
+       //收起  glyphicon glyphicon-arrow-down
+      //alert(collapse.attr("class"));
+$(this).find('#huifu').text("回复此楼");
+//$(this).find('#arrowicon').setAttribute('class', 'glyphicon glyphicon-arrow-down');
+     $(this).find('#arrowicon').attr("class","glyphicon glyphicon-arrow-down");
+   collapse.removeClass("in");
+
+   } else{
+     collapse.toggle();
+ //alert("2");
+//$('[id^=huifu]').text("收起回复");
+$(this).find('#huifu').text("收起回复");
+//$(this).find('#arrowicon').setAttribute('class', 'glyphicon glyphicon-arrow-down');
+  $(this).find('#arrowicon').attr("class","glyphicon glyphicon-arrow-up");
+collapse.addClass("in");
+
+   }
+
+
+
+
+  });
+ 
+
+
+
+//var id = $('[id^=nestcommentSend]').val();
+//console.log(id);
+
+
+
+
+
+//$('#postchildcomment$id').submit(function(event){
+
+ $('[id^=postchildcomment]').submit(function(event){    // this is not the button
+  event.preventDefault();
+
+ //var btn = $(this).find("input[type=submit]:focus" );
+//var parent_comment_id =  $('[id^=nestcommentSend]').val();
+var parent_comment_id = $(this).find("button[type=submit]" ).val();
+var comment_content = $("#nestcommentinput" + parent_comment_id).val();
+var comment_name = $("#nestcommentName" + parent_comment_id).val();
+
+
+
+var dataString = 'comment_content='+comment_content+'&parent_comment_id='+parent_comment_id+'&comment_name='+comment_name;
+
+       
+     $querry=   $.ajax({
+            type: 'POST',
+            url: '/comment/nestComment',
+            data: dataString,
+            dataType: 'json',
+        })
+
+        .done(function(data) {  
+         // console.log("saved!!");
+          //console.log(data);
+var content = data['content'];
+var name = data['name'];
+var time = data['time'];
+//alert(time);
+//var jsdate = (new Date()).toISOString();
+var lists = document.getElementById("commentList"+parent_comment_id);
+var newitem = document.createElement('li');  
+newitem.setAttribute("id", "childlist");
+newitem.className = "am-g"; 
+
+//anewitem.addClass("am-g");
+newitem.innerHTML = "<div class='commentText'>"+content + "</div>" +
+           "<div id='child-comment-meta'  style='display:inline'>" +
+            "<a href='#link-to-user' class='am-comment-author'>" +name + "</a>" + 
+             "评论于" +time +"</time>" 
+           +"</div>";
+
+
+
+
+
+//var child = document.createTextNode(content+ name + time);
+
+//newitem.appendChild(document.createTextNode(content));
+lists.appendChild(newitem);
+alert("评论成功！");
+
+
+           }  
+
+           );
+      //alert("false");
+     //return false
+
+
+
+         });
+
+
+
 
 
 
@@ -58,11 +232,12 @@ var id =  $('#faverate').val();
     });
 
 
+
   $('[id^=delete]').on('click', function(e) {
    var $form=$(this).closest('form'); 
     e.preventDefault();
     $('#confirmDelete').modal({ backdrop: 'static', keyboard: false })
-        .one('click', '#delete', function() {
+        .one('click', '#sure', function() {
             $form.trigger('submit'); // submit the form
         });
 
@@ -103,9 +278,7 @@ $('#halloworld li a').click(function (e) {
 
 //var root = '{{url("/")}}';
 //create the DOM object
-    var newSpan = document.createElement('span');
-    // add the class to the 'spam'
-    newSpan.setAttribute('class', 'caret');
+   
     
 
 
@@ -188,6 +361,7 @@ $("#charakters").tagit({
 
   }
 });
+
 
 
 

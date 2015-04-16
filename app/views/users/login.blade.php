@@ -27,6 +27,8 @@
       <div class="form-group {{ ($errors->has('pass1')) ? ' has-error' : '' }}">
         <label for="pass1">密码: </lable>
           <input id="pass1" name="pass1" type="password" class="form-control">
+
+
          
       </div>
       <div class="checkbox">
@@ -37,7 +39,8 @@
         </label>
       </div>
  <br/>
-      {{ Form::token() }}
+
+     <input type="hidden" name="_token" value="{{ csrf_token() }}">
        <div class="am-cf">
         <input type="submit" value="登录" class="am-btn am-btn-primary am-btn-sm am-fl">
       </div>

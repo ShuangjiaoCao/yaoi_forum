@@ -37,8 +37,10 @@
 				<label for="pass2">密码确认: </lable>
 					<input id="pass2" name="pass2" type="password" class="form-control">
 					
+					
 			</div>
-			{{ Form::token() }}
+			<input type="hidden" name="_token" value="{{ csrf_token() }}">
+
 			<div class="am-cf">
 				<input type="submit" value="注册" class="am-btn am-btn-primary am-btn-sm am-fl">
 			</div>

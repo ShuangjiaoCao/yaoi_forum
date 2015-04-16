@@ -19,7 +19,7 @@
         <input id="email" name="email" type="email" readonly="readonly" value="{{ $user->email }}"/>
         <br/>
         {{ Form::label('nickname', '马甲:') }}
-        <input id="nickname" name="nickname" type="text" value="{{{ Input::old(name) }}"/>
+        <input id="nickname" name="nickname" type="text" value=" "/>
         <br/>
         {{ Form::label('old_password', '旧密码:') }}
         {{ Form::password('old_password') }}

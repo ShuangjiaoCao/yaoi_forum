@@ -4,6 +4,11 @@
 <div class="am-g am-g-fixed blog-g-fixed">
   <div class="am-u-sm-12">
 
+ @if ($errors->has())
+    <div class="am-alert am-alert-danger" data-am-alert>
+      <p>{{ $errors->first() }}</p>
+    </div>
+    @endif
 
 <ul id="halloworld" class="nav nav-tabs">
   <li role="presentation" class="active"><a href="javascript:activateTab('searchpage1')">一般搜索</a></li>
@@ -14,11 +19,7 @@
 
  <div id="tabCtrl">
 
- @if ($errors->has())
-    <div class="am-alert am-alert-danger" data-am-alert>
-      <p>{{ $errors->first() }}</p>
-    </div>
-    @endif
+
 
 <!---->
 

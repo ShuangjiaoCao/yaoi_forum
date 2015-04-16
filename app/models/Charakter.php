@@ -1,12 +1,8 @@
 <?php
 
-use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class Charakter extends Eloquent {
-
-    use SoftDeletingTrait;
-
-    protected $fillable = ['name'];
+   protected $fillable = ['name'];
 
     public function posts()
     {

@@ -4,76 +4,268 @@
 
 
 
-
-
-  <div class="am-g am-g-fixed">
+  <div class="am-g am-g-fixed" id="fixPost">
       <div  class="am-u-sm-12">
         <br/>
-
-        
+     
       <article  class="am-article" value="{{$post->id}} " >
         <div id="article_title" class="am-article-hd">
           <h1 class="am-article-title">  
-           <a href="{{ URL::to('circle/' . $post->circle_id . '/posts') }}" id="circlename_show" class="am-badge am-badge-warning am-radius"> {{{$post->circle->name}}}</a>
+           
+           {{{ ($post->isEnd == 0) ? '[完结]' : '[连载]'}}}   {{{ $post->title }}}</h1>
+
+        </div>
+        <div class="am-article-bd" >
+   
+
+
+<div class="am-g">
+  <div id="summaryField" >
+<div  class="am-g">
+     <div class="am-u-sm-12">
+          <div id="summarytext">{{ $post->summary }}</div>
+
+      </div>
+</div>
+
+
+
+         <div  class="am-g">
+    <div id= "tagsvor" class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+            
+              
+              圈子:
+              <a href="{{ URL::to('circle/' . $post->circle_id . '/posts') }}" id="circlename_show" class="am-badge am-badge-warning am-radius"> {{{$post->circle->name}}}</a>
+
+
+              CP:
               @foreach ($post->cps as $cp)
                   <a  href="{{ URL::to('cp/' .  $cp->id . '/posts') }}" id="cpname_show" class="am-badge am-badge-warning am-radius">{{ $cp->name }}</a>
               @endforeach
-           {{{ ($post->isEnd == 0) ? '[完结]' : '[连载]'}}}   {{{ $post->title }}}</h1>
-       <p class="am-article-meta">作者: <a style="cursor: pointer;">{{{ $post->name }}}</a> 发表时间{{ $post->updated_at }}</p>
-        </div>
-        <div class="am-article-bd" >
 
-        <span class="label label-danger">{{ ($post->is18 == 1) ? '有肉' : ''  }}</span>
-        </td>
-          @if ($post->user_id == Auth::id())
-            <td>
-              <a id="editpost" href="{{ URL::to('post/'. $post->id . '/edit') }}" class="am-btn am-btn-xs am-btn-primary"><span class="am-icon-pencil"></span> 编辑</a>
-        
 
-  {{ Form::open(array('action' => array('PostController@destroy', $post->id), 'method' => 'DELETE' ,'style' => 'display: inline'))}}
-                  <button  type="button" class="am-btn am-btn-xs am-btn-danger" type='submit'value="delete" id="delete{{$post->id}}" ><span class="am-icon-remove"></span> 删除</button>
-              {{ Form::close() }}
-            </td>
+
+            角色:
+            @foreach ($post->charakters as $charakter)
+                  <a  href="{{ URL::to('charakter/' .  $charakter->id . '/posts') }}" id="peoplename_show" class="am-badge am-badge am-radius">{{ $charakter->name }}</a>
+              @endforeach
+
+            TAGS:
+              @foreach ($post->tags as $tag)
+                  <a href="{{ URL::to('tag/' . $tag->id . '/posts') }}" id="tagsname_show" class="am-badge am-badge am-radius">{{ $tag->name }}</a>
+              @endforeach
+     
+  </div>
+ </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+<div id="autorbox" class="am-g  form-inline" >
+
+<div class="am-u-sm-2 am-u-md-1 am-u-lg-1" id="article-autor">
+      <div id="autor1">作者</div>
+</div>   
+
+<div class="am-u-sm-7 am-u-md-5 am-u-lg-5" id="article-item1"> 
+
+
+<div class="am-show-md-up form-inline" id="autor2">
+ @if ($post->is_admin==1)
+    <b> <font color="green">{{ $post->name }}</font> </b>
+        @else 
+     <b>{{ $post->name }} </b>
+
+          @endif 
+
+
+<font size="1,5px"> 发表于:{{ $post->created_at->timezone('Asia/Shanghai') }} </font> <span class="label label-danger">{{ ($post->is18 == 1) ? '有肉' : ''  }}</span></div>
+
+<div class="am-show-sm-only" id="autor2"><b>{{{$post->name }}}</b>  <span class="label label-danger">{{ ($post->is18 == 1) ? '有肉' : ''  }}</span></div>
+
+
+
+
+</div> 
+
+<div class="am-u-sm-3 am-u-md-6 am-u-lg-6" id="article-item2">    
+      
+<div class="am-show-sm-only">
+<nav id="phonemenunav" data-am-widget="menu" class="am-menu am-menu-dropdown1" data-am-menu-collapse>
+  <a href="javascript: void(0)" class="am-menu-toggle">
+    <span id="phonemenu" class="am-menu-toggle-title">戳我</span>
+    <i class="am-menu-toggle-icon am-icon-angle-right"></i>
+  </a>
+  <ul class="am-menu-nav am-avg-sm-1 am-collapse">
+    <li class="am-parent">
+      
+    </li>
+   
+      
+       @if (Auth::check() && Auth::user()->is_admin)
+        <li class="">    
+       <a href="##" class="">
+        <form  role="form" name="blockpost" action="" id="blockform">  
+         @if( $post->block==0) 
+
+        <button id="blockpost" value="{{$post->id}}"  class="am-btn am-btn am-btn-defaut">锁</button>
+        @else
+        <button id="blockpost" value="{{$post->id}}"  class="am-btn am-btn am-btn-defaut">解锁</button>
           @endif
 
-            <td>
-             
-              <a id="onlypost" href="{{ URL::to('post/'. $post->id . '/allupdates') }}" class="am-btn am-btn-xs am-btn-primary"><span class="am-icon-eye"></span> 楼主 </a>
+         </form>
+      
+      </a>
+    </li>
+  @endif  
+
+
+
+        @if (Auth::check() && Auth::user()->is_admin)  
+
+    <li class="">
+      <a href="##" class="">  
+        <form  role="form" name="toppost" action="" id="topform"> 
+          @if( $post->top==0) 
+        <button id="toppost" value="{{$post->id}}"  class="am-btn am-btn-xs am-btn-defaut">置顶</button>
+           @else
+        <button id="toppost" value="{{$post->id}}"  class="am-btn am-btn-xs am-btn-defaut">取消置顶</button>
+          @endif
+         </form>
+           </a>
+    </li>
+        @endif
+   
+
+
+    
       @if (Auth::check())
-
-<div id="faverate_form">
-<form  name="faverate" action="">
-<fieldset>
-
+      <li class="">
+      <a href="##" class="">
+  <form  name="faverate" action="" id="faverateform">
     @if ($alreadyLike==true)  
-  <button type="submit" value="{{$post->id}}" id="faverate" class="am-btn am-btn-xs am-btn-danger am-active"><span class="am-icon-heart"></span></button>
+      <button type="submit" value="{{$post->id}}" id="faverate" class="am-btn">取消收藏</button>
     @else 
-      <button type="submit" value="{{$post->id}}" id="faverate" class="am-btn am-btn-xs am-btn-danger"><span class="am-icon-heart"></span></button>
+      <button type="submit" value="{{$post->id}}" id="faverate" class="am-btn">收藏</button>
     @endif 
 
+  </form>
 
- </fieldset>
- </form>
- </div>
-      @endif
+      </a>
+    </li>
+@endif
 
-        </tr> 
-        <blockquote>
-              相关人物:
-              @foreach ($post->charakters as $charakter)
-                  <a  href="{{ URL::to('charakter/' .  $charakter->id . '/posts') }}" class="am-badge am-badge am-radius">{{ $charakter->name }}</a>
-              @endforeach
-            </blockquote>  
-           <blockquote>
-              其他Tags:
-              @foreach ($post->tags as $tag)
-                  <a href="{{ URL::to('tag/' . $tag->id . '/posts') }}" class="am-badge am-badge am-radius">{{ $tag->name }}</a>
-              @endforeach
-            </blockquote>  
 
-    <div class="am-article-lead">
-          <p>{{ $post->summary }}</p>
+    <li class="">
+   
+ <a id="onlypost" href="{{ URL::to('post/'. $post->id . '/allupdates') }}" class="">只看楼主</a>
+
+    </li>
+
+
+   
+
+      @if (Auth::check()) 
+   @if ($post->user_id == Auth::id()|| Auth::user()->is_admin)
+    <li class="">
+
+             <a id="editpost" href="{{ URL::to('post/'. $post->id . '/edit') }}" class="">编辑</a>
+              </li>
+    @endif
+           @endif 
+
+   
+
+
+   
+@if (Auth::check()) 
+          @if ($post->user_id == Auth::id()|| Auth::user()->is_admin)
+<li class="">
+     <a href="##" class="">
+  {{Form::open(array('action' => array('PostController@destroy', $post->id), 'method' => 'DELETE' ,'style' => 'display: inline'))}}
+                  <button  class="am-btn am-btn-xs" type="submit" value="delete" id="delete{{$post->id}}" >删除</button>
+              {{ Form::close() }}
+                    </a>
+    </li>
+           
+          @endif
+           @endif 
+     
+  </ul>
+</nav>
+
+</div> 
+
+
+ <div class="am-show-md-up">
+
+      
+
+        @if (Auth::check() && Auth::user()->is_admin)    
+        <form  role="form" name="blockpost" action="" id="blockform">  
+         @if( $post->block==0) 
+        <button id="blockpost" value="{{$post->id}}"  class="am-btn am-btn-xs am-btn-defaut">锁</button>
+        @else
+        <button id="blockpost" value="{{$post->id}}"  class="am-btn am-btn-xs am-btn-defaut">解锁</button>
+          @endif
+         </form>
+
+         <form  role="form" name="toppost" action="" id="topform"> 
+          @if( $post->top==0) 
+        <button id="toppost" value="{{$post->id}}"  class="am-btn am-btn-xs am-btn-defaut">置顶</button>
+           @else
+        <button id="toppost" value="{{$post->id}}"  class="am-btn am-btn-xs am-btn-defaut">取消置顶</button>
+          @endif
+         </form>
+        @endif
+
+
+
+
+@if (Auth::check())
+  <form  name="faverate" action="" id="faverateform">
+    @if ($alreadyLike==true)  
+      <button type="submit" value="{{$post->id}}" id="faverate" class="am-btn"><span id="faverate_full" class="glyphicon glyphicon-star"></span></button>
+    @else 
+      <button type="submit" value="{{$post->id}}" id="faverate" class="am-btn"><span id="faverate_empty" class="glyphicon glyphicon-star-empty"></span></button>
+    @endif 
+    </td>
+  </form>
+@endif
+
+
+
+ <a id="onlypost" href="{{ URL::to('post/'. $post->id . '/allupdates') }}" class="am-btn am-btn-xs am-btn-primary"><span class="am-icon-eye"></span>只看楼主</a>
+
+
+     
+      @if (Auth::check()) 
+          @if ($post->user_id == Auth::id()|| Auth::user()->is_admin)
+
+             <a id="editpost" href="{{ URL::to('post/'. $post->id . '/edit') }}" class="am-btn am-btn-xs"><span class="am-icon-pencil"></span></a>
+   
+  {{Form::open(array('action' => array('PostController@destroy', $post->id), 'method' => 'DELETE' ,'style' => 'display: inline'))}}
+                  <button  class="am-btn am-btn-xs" type="submit" value="delete" id="delete{{$post->id}}" ><span class="am-icon-remove"></span></button>
+              {{ Form::close() }}
+           
+          @endif
+           @endif 
+  
+             
+
+</div> 
+</div> 
+
+
     </div>
+</div>
+
+
         <div  id="article_bd"  class="am-article-divider" >
 
 
@@ -82,7 +274,9 @@
 @if($post->is18 ==1  &&  !Auth::check()  ) 
  <div style="color:red"> 我是一块红烧肉  </div>
 @else
- <p>{{ $post->resolved_content }}</p>
+
+ <div id="postcontent">{{ $post->resolved_content }}  </div>
+
 @endif       
         </div>
         <br/>
@@ -96,174 +290,14 @@
     <div class="am-alert am-alert-danger" data-am-alert>
       <p>{{ $errors->first() }}</p>
     </div>
-    @endif
+ @endif
 
-
-<section id="comments">
-<article class="am-comment">
-  
-
-       
-        
-    @if (count($post->comments) != 0)
-
-     <article id="comment_article" class="am-comment am-comment-primary">
-
-       <ul class="am-comments-list" id="commentlist">
-
-        @foreach ($comments as $comment)
-
-        
-
-         @if ($comment->isUpdate != 1) 
-        <header class="am-comment-hd">
-       <div class="am-comment-meta">
-        <a href="#link-to-user" class="am-comment-author">{{ $comment->name }} </a>
-        评论于 <time datetime="2013-07-27T04:54:29-07:00" title="2013年7月27日 下午7:54 格林尼治标准时间+0800">{{$comment->updated_at}}</time>
-        <span class="commentCount"> {{ $comment->index}} 楼</span>
-       </div>
-       </header>
-
-
-       <div class="am-comment-bd">
-
-        <li class="am-comment">
-
-        
-         
-            {{ $comment->content }}
-         </li>  
-       </div>
-
-         @else  
-
-
-         <header class="am-comment-hd">
-       <div class="am-comment-meta" >
-        <a href="#link-to-user" class="am-comment-author">{{ $post->name }} </a>
-        更新于 <time datetime="2013-07-27T04:54:29-07:00" title="2013年7月27日 下午7:54 格林尼治标准时间+0800">{{ $comment->updated_at }}</time>
-         <span class="label label-danger">{{ ($comment->is18 == 1) ? '此章有肉' : ''  }}</span>
-          <span class="commentCount"> {{ $comment->index}} 楼</span>
-       </div>
-       
-       </header>
-
-
-
-       <div class="am-comment-bd">
-      <li class="am-comment">
-
-   
-            @if($comment->is18 ==1  &&  !Auth::check()  ) 
-         <div style="color:red"> 我是一块红烧肉  </div>
-      @else
-      <p>{{ $comment->content }}</p>
-      @endif       
-
-         </li>  
-       </div>
-        @endif
-     
-       
-     
-        @endforeach
-            
-    
-        </ul>
- 
-
-
-
-    @endif
-
-   </article>  
-
-
-
-  </article>
-
-</section>
+@include('articles.comments')
 
 
 
 
-  <section>
-  
 
-
-        <br/>
-
-
- @if ($post->user_id == Auth::id())
-  <form action="{{ URL::route('createUpdate', array('id' => $post->id)) }}" method="post">
-      
-    <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
-
-
-      <div class="form-group">
-        <textarea name="content" class="form-control" rows="20" placeholder="更新内容"></textarea>
-      </div>
-      <div class="row form-inline"  >
-
-
-    <div class="form-group has-error " style="">
-        <div class="checkbox">
-        <label>
-     <input  name="is18" type="checkbox" value="0">
-      此章有肉
-    </label>
-  </div>
- </div>
-
-  <div class="col-xs-2">
-  <div class="form-group">
-        <div class="checkbox">
-        <label>
-     <input  name="isEnd" type="checkbox" value="0">
-      勾我完结
-    </label>
-  </div>
- </div>
-  </div>
-   </div>
-
-<button type="submit" class="btn btn-primary btn-lg"> 更新文章 </button>
-    </form>
- @else
-
-
-    <form action="{{ URL::route('createComment', array('id' => $post->id)) }}" method="post">
-
-      <div class="form-group">
-      <input name="name" class="form-control" type="text" value="{{ Input::old('name')}}"  placeholder="昵称" />   
-       </div>
-     
-
-      <div class="form-group">
-        <textarea name="content" class="form-control" rows="5" placeholder="评论内容"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary btn-lg"> 回复 </button>
-    </form>
-
-     
-
-  @endif
-
-  <p class="list-group-item-text">{{ $comments->links() }}</p>
-   
-  </section>
-
-<div class="am-modal am-modal-confirm" tabindex="-1" id="my-confirm">
-  <div class="am-modal-dialog">
-    <div class="am-modal-hd">删除文章</div>
-    <div class="am-modal-bd">你确定要删除吗？
-    </div>
-    <div class="am-modal-footer">
-      <span class="am-modal-btn" data-am-modal-cancel>取消</span>
-      <span class="am-modal-btn" data-am-modal-confirm>确定</span>
-    </div>
-  </div>
-</div>
 
 <div class="modal fade" id="confirmDelete" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -277,7 +311,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-        <button type="button" class="btn btn-primary"  id="delete">确定</button>
+        <button type="button" class="btn btn-primary"  id="sure">确定</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
