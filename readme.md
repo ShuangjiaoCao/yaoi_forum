@@ -19,11 +19,11 @@ Distribution code: `https://github.com/farrah8888/yaoi_forum.git`
 
 Completed example: `git clone -b completed https://github.com/farrah8888/yaoi_forum.git`
 
-3. Navigate into the new `BBS` folder and install dependencies
+3. Navigate into the new `bbs` folder and install dependencies
 
 `composer install`
 
-4. If you're running the completed example, you need to create the database called `BBS` and then run
+4. If you're running the completed example, you need to create the database called `bbs` with username"root" and password"afldtvenus" (or see app/config/database, change the username and password yourself)and then run
 
 `php artisan migrate`
 
